@@ -60,28 +60,28 @@ class neuronet:
         self.dw[0] += self.l_rate * self.dh.dot(self.z[0].reshape(1, self.layers[0]))
         return
     
-    def train_batch(self, data, l_rate):
+    def train_batch(self, inputs_list, targets_list, l_rate):
         self.l_rate = l_rate
-        for x, correct_y in data:
-            correct_y = np.array(correct_y)
+        for i in range(len(inputs_list)):
+            target = np.array(targets_list[i])
             
             self.dw = [np.zeros((self.layers[i+1], self.layers[i])) for i in range(self.size-1)]
             self.db = [np.zeros((self.layers[i+1],)) for i in range(self.size-1)]
-            y = self.predict(x)
-            L = self.Loss(y, correct_y)
-            self.dh = self.gLoss_der(y, correct_y)
+            y = self.predict(inputs_list[i])
+            L = self.Loss(y, target)
+            self.dh = self.gLoss_der(y, target)
             self.back_pr()
             
         for i in range (self.size-1):
             self.w[i] -= self.dw[i]
             self.b[i] -= self.db[i]
         return L
-    def train(self, data, l_rate, batch_size):
+    def train(self, inputs_list, targets_list, l_rate=0.3, batch_size=1):
         Loss = []
         X = []
         for i in range(len(data)//batch_size):
             j = i*batch_size
-            L = self.train_batch(data[j:j+batch_size], l_rate)
+            L = self.train_batch(inputs_list[j:j+batch_size], targets_list[j:j+batch_size], l_rate)
             Loss.append(L)
             X.append(i)
         plt.plot(X, Loss)
