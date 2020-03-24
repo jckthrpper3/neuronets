@@ -62,20 +62,21 @@ class neuronet:
     
     def train_batch(self, inputs_list, targets_list, l_rate):
         self.l_rate = l_rate
+        L = 0
         for i in range(len(inputs_list)):
             target = np.array(targets_list[i])
             
             self.dw = [np.zeros((self.layers[i+1], self.layers[i])) for i in range(self.size-1)]
             self.db = [np.zeros((self.layers[i+1],)) for i in range(self.size-1)]
             y = self.predict(inputs_list[i])
-            L = self.Loss(y, target)
+            L += self.Loss(y, target)
             self.dh = self.gLoss_der(y, target)
             self.back_pr()
             
         for i in range (self.size-1):
             self.w[i] -= self.dw[i]
             self.b[i] -= self.db[i]
-        return L
+        return L/len(inputs_list)
     def train(self, inputs_list, targets_list, l_rate=0.3, batch_size=1):
         Loss = []
         X = []
